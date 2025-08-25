@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Youtube Video Downloader</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>YouTube Video Downloader</h1>
+            <p>Whoisparis prod.</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <div class="url-input-container">
+                    <input
+                        type="url"
+                        id="videoUrl"
+                        placeholder="Youtube video URL"
+                        autocomplete="off"
+                    >
+                    <button id="fetchInfoBtn">Search</button>
+                </div>
+            </div>
+
+            <div id="error" class="error hidden">
+                <p>❌<span id="errorMessage"></span></p>
+            </div>
+
+            <div id="videoInfo" class="video-info hidden">
+                <div class="video-card">
+                    <div class="video-thumbnail">
+                        <img id="videoThumbmail" src="" alt="Video thumbnail">
+                        <div class="video-duration" id="videoDuration"></div>
+                    </div>
+
+                    <div class="video-details">
+                        <h2 id="videoTitle"></h2>
+                        <p class="video-author">Author:<span id="videoAuthor"></span></p>
+                    </div>
+                </div>
+
+                <div class="quality-selection">
+                    <h3>Choose video quality</h3>
+                    <div id="qualityButtons" class="quality-buttons"></div>
+                </div>
+            </div>
+
+            <div id="downloadProgress" class="download-progress hidden">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <p>Loading...<span id="progressPercent">0%</span></p>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2025 YouTube Downloader API | Whoisparis</p>
+        </footer>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
