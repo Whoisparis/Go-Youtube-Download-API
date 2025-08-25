@@ -45,21 +45,28 @@ func (s *YoutubeService) GetVideoInfo(ctx context.Context, url string) (*youtube
 func (s *YoutubeService) DownloadVideo(ctx context.Context, video *youtube.Video, itagStr string, quality string) (*youtube.Format, io.ReadCloser, error) {
 	var format *youtube.Format
 
+
 	log.Printf("Looking for format: itag=%s, quality=%s", itagStr, quality)
 
 	// Приоритет 1: Поиск по ITAG (если указан)
 	if itagStr != "" {
 		// Конвертируем строку в число
+
+	if itagStr != "" {
 		itag, err := strconv.Atoi(itagStr)
 		if err != nil {
 			return nil, nil, fmt.Errorf("invalid itag format: must be a number, got '%s'", itagStr)
 		}
+
 
 		log.Printf("Searching for itag: %d", itag)
 		for i := range video.Formats {
 			if video.Formats[i].ItagNo == itag {
 				format = &video.Formats[i]
 				log.Printf("Found format by itag: %+v", format)
+		for i := range video.Formats {
+			if video.Formats[i].ItagNo == itag {
+				format = &video.Formats[i]
 				break
 			}
 		}
@@ -85,6 +92,20 @@ func (s *YoutubeService) DownloadVideo(ctx context.Context, video *youtube.Video
 	// Приоритет 3: Берем лучший доступный формат с аудио
 	if format == nil {
 		log.Printf("Selecting best available format with audio")
+			return nil, nil, fmt.Errorf("format with itag %s not found", itagStr)
+		}
+	}
+
+	if format == nil && quality == "" {
+		formats := video.Formats.Quality(quality)
+		if len(formats) > 0 {
+			format = &formats[0]
+		} else {
+			return nil, nil, fmt.Errorf("no formats found for quality '%s'", quality)
+		}
+	}
+
+	if format == nil {
 		formats := video.Formats.WithAudioChannels()
 		if len(formats) == 0 {
 			return nil, nil, fmt.Errorf("no suitable format with audio found")
@@ -97,6 +118,11 @@ func (s *YoutubeService) DownloadVideo(ctx context.Context, video *youtube.Video
 	stream, _, err := s.client.GetStreamContext(ctx, video, format)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get video stream: %w", err)
+	}
+
+	stream, _, err := s.client.GetStreamContext(ctx, video, format)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get video stream: %v", err)
 	}
 
 	return format, stream, nil
@@ -138,6 +164,15 @@ func getAvailableQualities(formats []youtube.Format) []string {
 		}
 		if f.QualityLabel != "" {
 			qualities[f.QualityLabel] = true
+		return ".video"
+	}
+}
+
+func (s *YoutubeService) GetAvailableQualities(formats []youtube.Format) []string {
+	qualities := make(map[string]bool, len(formats))
+	for _, format := range formats {
+		if format.QualityLabel != "" {
+			qualities[format.QualityLabel] = true
 		}
 	}
 
@@ -154,4 +189,9 @@ func getAvailableItags(formats []youtube.Format) []int {
 		itags = append(itags, f.ItagNo)
 	}
 	return itags
+}
+	for quality := range qualities {
+		result = append(result, quality)
+	}
+	return result
 }
